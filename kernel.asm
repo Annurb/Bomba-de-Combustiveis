@@ -48,7 +48,7 @@
 # (duas threads com mesmo código), dependendo da aplicação pode ser algo útil...
 
 .eqv max_th 2
-.eqv thread_v principal, mDigitalLab
+.eqv thread_v mPrincipal, mDigitalLab
 
 ##################################################################################### #############
 
