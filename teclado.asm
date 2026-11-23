@@ -1,5 +1,6 @@
 .globl varrer_teclado
 .globl decodificar_tecla
+.globl ler_tecla
 
 .data
 teclas:	.byte 0x11,0x21,0x41,0x81,0x12,0x22,0x42,0x82,0x14,0x24,0x44,0x84,0x18,0x28,0x48,0x88
@@ -34,4 +35,11 @@ decodificar_loop:
 	jr	$ra
 decodificar_achou:
 	move	$v0 $t1
+	jr	$ra
+
+ler_tecla:
+	lw	$t0 tecla_nova
+	beqz	$t0 ler_tecla
+	sw	$zero tecla_nova
+	lw	$v0 tecla_pub
 	jr	$ra

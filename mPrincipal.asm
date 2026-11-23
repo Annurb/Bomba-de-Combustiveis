@@ -3,7 +3,7 @@ msg_ligar_desligar:		.asciiz "\nDigite A para ligar a máquina e B para desligar
 msg_operador_cliente:		.asciiz "\nEscolha modo [A]Cliente/[B]Operador: "
 
 msg_operador_combustivel:	.asciiz "\nEscolha o combustível a ser alterado: "
-msg_tipo_combustivel:		.asciiz "\n1 - Gasolina Comum\n2- Gasolina Aditivada\n3- Álcool\nEscolha: "
+msg_tipo_combustivel:		.asciiz "\n1 - Gasolina Comum\n2 - Gasolina Aditivada\n3 - Álcool\nEscolha: "
 msg_digitar_novo_preco:		.asciiz "\nDigite o novo preço a ser inserido pro tipo de combustível escolhido [1-999 centavos]: "
 
 msg_invalido:			.asciiz "\nNúmero inválido inserido, digite novamente"
@@ -92,6 +92,7 @@ jal imprimir_mensagem
 la $a0, msg_tipo_combustivel
 jal imprimir_mensagem
 
+loop_escolher_combustivel_a_alterar:
 jal ler_tecla
 
 li $t0, TECLA_CANCELA
@@ -113,7 +114,7 @@ else_escolher_combustivel:
 la $a0, msg_invalido
 jal imprimir_mensagem
 
-j Escolher_combustivel_a_alterar
+j loop_escolher_combustivel_a_alterar
 fim_escolher_combustivel:
 j Digitar_novo_preco
 
@@ -331,7 +332,7 @@ Gerar_nota_fiscal:
 lw $a0, escolha_combustivel_cliente
 lw $a1, preco_venda
 lw $a2, volume_ml
-jal gerar_nota # Funcao pra gerar a nota fiscal a partir desses 
+jal gerar_cupom # Funcao pra gerar a nota fiscal a partir desses 
 j Finalizado
 
 # Estado para a finalização da transação

@@ -96,6 +96,9 @@
 
 .eqv sp  112
 
+.eqv hi_r 116
+.eqv lo_r 120
+
 .kdata
 thread_atual: .word 0
 max_threads: .word max_th
@@ -187,6 +190,11 @@ lw $t9 t9($k0)
 lw $ra ra($k0)
 
 lw $sp sp($k0)
+
+lw $k1 hi_r($k0)
+mthi $k1
+lw $k1 lo_r($k0)
+mtlo $k1
 
 li $k1 0x80		# Reabilita o contador
 sb $k1 0xffff0013	# de instruções
@@ -404,6 +412,11 @@ sw $t9 t9($k0)
 sw $ra ra($k0)
 
 sw $sp sp($k0)
+
+mfhi $k1
+sw $k1 hi_r($k0)
+mflo $k1
+sw $k1 lo_r($k0)
 
 mfc0 $k1 $14 # guardar pc
 sw $k1 pc($k0)
