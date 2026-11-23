@@ -6,13 +6,15 @@ tecla_nova:	.word 0
 # Lembrar do display buffer depois
 .text
 .globl mDigitalLab
+.globl tecla_pub
+.globl tecla_nova
 
 mDigitalLab:
 # Estado 0
 # O estado 0 serve pra varrer o teclado, lê-lo e devolver seu valor
 Varrer:
-
-jal varrer_teclado # Devolve uma tecla ou 0 em v0, basivcamente é um procedimento que lê o teclado
+jal atualizar_display # mantem o display atualizado sem techa
+jal varrer_teclado # Devolve uma tecla ou 0 em v0, basicamente é um procedimento que lê o teclado e devolver o valor
 beq $v0, $zero, Varrer # Se v0 for 0 entao volta pro estado varrer
 sw $v0, tecla_atual # Se nao, guarda o valor na tecla_atual
 j Tecla_detectada # Proximo estado
@@ -32,6 +34,7 @@ j Aguardar_liberacao
 # O estado 2 serve pra esperar que o varrer teclado devolva 0, no caso que a tecla seja solta
 Aguardar_liberacao:
 
+jal atualizar_display
 jal varrer_teclado
 bnez $v0, Aguardar_liberacao # Se o valor for diferente de 0, vai continuar aqui
 j Publicar
