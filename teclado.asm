@@ -21,7 +21,7 @@ varrer_fim:
 	jr	$ra
 
 decodificar_tecla:
-	la	$t0 tabela_teclas
+	la	$t0 teclas
 	li	$t1 0 # Índice = valor da tecla
 	li	$t2 16 # Teclado do LabSim vai de 0 até f (0 a 15)
 decodificar_loop:
