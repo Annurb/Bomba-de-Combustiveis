@@ -17,81 +17,92 @@ combustiveis:		.word comb1, comb2, comb3
 buffer_cupom:		.space 256
 .text
 gerar_cupom:
-	addiu	$sp $sp -20
+	addiu	$sp $sp -28
 	sw	$ra 0($sp)
 	sw	$s0 4($sp)
 	sw	$s1 8($sp)
 	sw	$s2 12($sp)
 	sw	$s3 16($sp)
+	sw	$s4 20($sp)
+	sw	$s5 24($sp)
 	
 	move	$s0 $a0
 	move	$s1 $a1
 	move	$s2 $a2
-	la	$s3 buffer_cupom # ponteiro de escrita
+	move	$s3 $a3
+	la	$s5 buffer_cupom # ponteiro de escrita
 	
 	la	$a0 cupom_cabeceira
-	move	$a1 $s3
+	move	$a1 $s5
 	jal	copiar_string
-	move	$s3 $v0
+	move	$s5 $v0
 	
 	la	$a0 cupom_comb
-	move	$a1 $s3
+	move	$a1 $s5
 	jal	copiar_string
-	move	$s3 $v0
+	move	$s5 $v0
 	
 	addiu	$t0 $s0 -1
 	sll	$t0 $t0 2
 	la	$t1 combustiveis
 	addu	$t1 $t1 $t0
 	lw	$a0 0($t1)
-	move	$a1 $s3
+	move	$a1 $s5
 	jal	copiar_string
-	move	$s3 $v0
+	move	$s5 $v0
 	
 	la	$a0 cupom_vol
-	move	$a1 $s3
+	move	$a1 $s5
 	jal	copiar_string
-	move	$s3 $v0
+	move	$s5 $v0
 	move	$a0 $s2
 	li	$a1 1000
-	move	$a2 $s3
+	move	$a2 $s5
 	jal	copiar_decimal
-	move	$s3 $v0
+	move	$s5 $v0
 	la	$a0 cupom_litr
-	move	$a1 $s3
+	move	$a1 $s5
 	jal	copiar_string
-	move	$s3 $v0
+	move	$s5 $v0
 	
 	la	$a0 cupom_prec
-	move	$a1 $s3
+	move	$a1 $s5
 	jal	copiar_string
-	move	$s3 $v0
+	move	$s5 $v0
 	move	$a0 $s1
 	li	$a1 100
-	move	$a2 $s3
+	move	$a2 $s5
 	jal	copiar_decimal
-	move	$s3 $v0
+	move	$s5 $v0
 	
 	la	$a0 cupom_total
-	move	$a1 $s3
+	move	$a1 $s5
 	jal	copiar_string
-	move	$s3 $v0
+	move	$s5 $v0
+	lw	$s4 modo_abastecimento
+	beq	$s4 0 modo_litros
+	j	modo_reais
+	modo_litros:
 	mul	$t0 $s2 $s1
 	li	$t1 1000
 	div	$t0 $t1
 	mflo	$a0 # total em centavos
+	j	continuar_cupom_total
+	modo_reais:
+	mul	$a0 $s3 100
+	continuar_cupom_total:
 	li	$a1 100
-	move	$a2 $s3
+	move	$a2 $s5
 	jal	copiar_decimal
-	move	$s3 $v0
+	move	$s5 $v0
 	
 	la	$a0 cupom_rodape
-	move	$a1 $s3
+	move	$a1 $s5
 	jal	copiar_string
-	move	$s3 $v0
+	move	$s5 $v0
 	
 	la	$t0 buffer_cupom
-	subu	$s2 $s3 $t0 # tamanho do texto
+	subu	$s2 $s5 $t0 # tamanho do texto
 	
 	la	$a0 buffer_cupom # mostra no console
 	jal	imprimir_mensagem
@@ -119,5 +130,7 @@ cupom_fim:
 	lw	$s1 8($sp)
 	lw	$s2 12($sp)
 	lw	$s3 16($sp)
-	addiu	$sp $sp 20
+	lw	$s4 20($sp)
+	lw	$s5 24($sp)
+	addiu	$sp $sp 28
 	jr	$ra

@@ -1,10 +1,11 @@
 .data 
 msg_ligar_desligar:		.asciiz "\nDigite A para ligar a máquina e B para desligar: "
 msg_operador_cliente:		.asciiz "\nEscolha modo [A]Cliente/[B]Operador: "
+msg_f_cancelar:			.asciiz "\n[Pressione F a qualquer momento para cancelar.]"
 
 msg_operador_combustivel:	.asciiz "\nEscolha o combustível a ser alterado: "
 msg_tipo_combustivel:		.asciiz "\n1 - Gasolina Comum\n2 - Gasolina Aditivada\n3 - Álcool\nEscolha: "
-msg_digitar_novo_preco:		.asciiz "\nDigite o novo preço a ser inserido pro tipo de combustível escolhido [1-999 centavos]: "
+msg_digitar_novo_preco:		.asciiz "\nDigite o novo preço a ser inserido pro tipo de combustível escolhido (1-999 centavos) [A - Confirmar]: "
 
 msg_invalido:			.asciiz "\nNúmero inválido inserido, digite novamente"
 
@@ -13,13 +14,15 @@ msg_desligar:			.asciiz "\nMáquina desligada, aperte A caso queira ligar novame
 msg_escolha_combustivel:	.asciiz "\nEscolha o tipo de combustível: "
 msg_escolher_modo:		.asciiz "\nEscolha o modo [A - Quantidade de litros/ B - Valor monetário]: "
 msg_finalizado:			.asciiz "\nTransação finalizada!"
-msg_digitar_quantidade:		.asciiz "\nDigite a quantidade desejada: "
+msg_digitar_quantidade:		.asciiz "\nDigite a quantidade desejada: (1-99 litros) [A - Confirmar]"
+msg_digitar_valor:		.asciiz "\nDigite o valor desejado: (1-99 reais) [A - Confirmar]"
 
 escolha_combustivel_operador:	.word 0
 escolha_preco:			.word 0
 
 escolha_combustivel_cliente:	.word 0 
 
+.globl modo_abastecimento
 modo_abastecimento:		.word 0
 
 quantidade:			.word 0 
@@ -69,6 +72,8 @@ j espera_selecionar_ciclo
 # Estado pra escolha do operador o cliente
 Operador_Cliente:
 
+la $a0, msg_f_cancelar
+jal imprimir_mensagem
 la $a0, msg_operador_cliente
 jal imprimir_mensagem
 
@@ -80,6 +85,9 @@ beq $v0, $t0, Escolher_combustivel_a_alterar
 
 li $t0, TECLA_A
 beq $v0, $t0, Escolha_combustivel
+
+li $t0, TECLA_CANCELA
+beq $v0, $t0, Selecionar_ciclo
 
 j espera_operador_cliente
 
@@ -163,22 +171,12 @@ j Selecionar_ciclo
 
 #Estado final desligar
 Desligar:
-li   $a0, -1
-jal  mostrar_display               # apaga o display
+li $a0, -1
+jal mostrar_display              
+jal atualizar_display	# apaga o display
 
-la   $a0, msg_desligar
-jal imprimir_mensagem
-
-espera_desligar:
-
-jal ler_tecla
-
-li $t0, TECLA_A
-beq $v0, $t0, Inicio
-
-
-j espera_desligar
-
+li	$v0 10
+syscall
 # -------------------------------------------------------------------------------------------
 # Estado para que o cliente escolha o combustível que ele quer 
 Escolha_combustivel:      
@@ -260,7 +258,13 @@ j Digitar_quantidade
 
 # Estado para digitar a quantidade que o cliente deseja
 Digitar_quantidade:
+lw   $t0, modo_abastecimento
+beq  $t0, 1, msg_valor # Imprime a mensagem de acordo com o modo selecionado
 la   $a0, msg_digitar_quantidade
+j    continuar_digitar_quantidade
+msg_valor:
+la   $a0, msg_digitar_valor
+continuar_digitar_quantidade:
 jal  imprimir_mensagem
 sw   $zero, quantidade              # zera o acumulador
 li   $a0, 0
@@ -281,7 +285,7 @@ bgt  $v0, $t0, loop_quantidade # B, C, D, E: ignora
 lw   $t1, quantidade
 mul  $t1, $t1, 10
 add  $t1, $t1, $v0 # valor = valor*10 + dígito
-li   $t2, 999
+li   $t2, 99
 bgt  $t1, $t2, loop_quantidade # passou do limite: ignora o dígito
 sw   $t1, quantidade
 move $a0, $t1
@@ -324,15 +328,16 @@ sw $v0, volume_ml # guarda o volume em mL antes de qualquer outra chamada
 li $t0, 1000
 div $a0, $v0, $t0 # mL => litros inteiros
 jal mostrar_display # (a atualizacao ao vivo deve ficar dentro de enchendo_bomba, no caso mostrar display dentro de enchendo bomba)
-j Gerar_nota_fiscal
+j Gerar_cupom_fiscal
 
 
-# Estado pra gerar a nota fiscal
-Gerar_nota_fiscal:
+# Estado pra gerar o cupom fiscal
+Gerar_cupom_fiscal:
 lw $a0, escolha_combustivel_cliente
 lw $a1, preco_venda
 lw $a2, volume_ml
-jal gerar_cupom # Funcao pra gerar a nota fiscal a partir desses 
+lw $a3, quantidade
+jal gerar_cupom # Funcao pra gerar o cupom fiscal a partir desses 
 j Finalizado
 
 # Estado para a finalização da transação
