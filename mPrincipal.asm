@@ -1,11 +1,10 @@
 .data 
 msg_ligar_desligar:		.asciiz "\nDigite A para ligar a máquina e B para desligar: "
 msg_operador_cliente:		.asciiz "\nEscolha modo [A]Cliente/[B]Operador: "
-msg_f_cancelar:			.asciiz "\n[Pressione F a qualquer momento para cancelar.]"
 
 msg_operador_combustivel:	.asciiz "\nEscolha o combustível a ser alterado: "
 msg_tipo_combustivel:		.asciiz "\n1 - Gasolina Comum\n2 - Gasolina Aditivada\n3 - Álcool\nEscolha: "
-msg_digitar_novo_preco:		.asciiz "\nDigite o novo preço a ser inserido pro tipo de combustível escolhido (1-999 centavos) [A - Confirmar]: "
+msg_digitar_novo_preco:		.asciiz "\nDigite o novo preço a ser inserido pro tipo de combustível escolhido: "
 
 msg_invalido:			.asciiz "\nNúmero inválido inserido, digite novamente"
 
@@ -14,8 +13,8 @@ msg_desligar:			.asciiz "\nMáquina desligada, aperte A caso queira ligar novame
 msg_escolha_combustivel:	.asciiz "\nEscolha o tipo de combustível: "
 msg_escolher_modo:		.asciiz "\nEscolha o modo [A - Quantidade de litros/ B - Valor monetário]: "
 msg_finalizado:			.asciiz "\nTransação finalizada!"
-msg_digitar_quantidade:		.asciiz "\nDigite a quantidade desejada: (1-99 litros) [A - Confirmar]"
-msg_digitar_valor:		.asciiz "\nDigite o valor desejado: (1-99 reais) [A - Confirmar]"
+msg_digitar_quantidade:		.asciiz "\nDigite a quantidade desejada: "
+msg_digitar_valor:		.asciiz "\nDigite o valor desejado: "
 
 escolha_combustivel_operador:	.word 0
 escolha_preco:			.word 0
@@ -72,8 +71,6 @@ j espera_selecionar_ciclo
 # Estado pra escolha do operador o cliente
 Operador_Cliente:
 
-la $a0, msg_f_cancelar
-jal imprimir_mensagem
 la $a0, msg_operador_cliente
 jal imprimir_mensagem
 
@@ -283,7 +280,7 @@ bgt  $v0, $t0, loop_quantidade # B, C, D, E: ignora
 lw   $t1, quantidade
 mul  $t1, $t1, 10
 add  $t1, $t1, $v0 # valor = valor*10 + dígito
-li   $t2, 99
+li   $t2, 999
 bgt  $t1, $t2, loop_quantidade # passou do limite: ignora o dígito
 sw   $t1, quantidade
 move $a0, $t1
