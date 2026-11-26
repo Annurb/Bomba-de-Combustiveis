@@ -131,8 +131,6 @@ Digitar_novo_preco:
 la   $a0, msg_digitar_novo_preco
 jal  imprimir_mensagem
 sw   $zero, escolha_preco          # acumulador em 0
-li   $a0, 0
-jal  mostrar_display               # display comeca em 0
 
 loop_preco:
 jal  ler_tecla
